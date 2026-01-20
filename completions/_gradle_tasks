@@ -1,0 +1,93 @@
+#!/bin/zsh
+
+_gradle_tasks() {
+    _tasks=(
+        "build"
+        "clean"
+        "test"
+        "assemble"
+    )
+    
+    _npmTasks=(
+        "npmBuild"
+    )
+    
+    _options=(
+        "--parallel"
+        "--rerun-tasks"
+        "--refresh-dependencies"
+    )
+    
+    _completions=()
+
+    _withTasksAll() {
+        _completions+=("${_tasks[@]}" "${_npmTasks[@]}")
+    }
+
+    _alreadySelected=("${words[@]:1}")    
+    
+    _suggestions=()
+    _isAnySuggestionSelected() {
+        for suggestion in $_suggestions; do
+            if [[ " ${_alreadySelected[*]} " =~ " ${suggestion} " ]]; then
+                return 0
+            fi
+        done
+        return 1
+    }
+
+    _isAnyTaskAlreadySelected() {
+        _suggestions=("${_tasks[@]}")
+        _isAnySuggestionSelected
+    }
+
+    _isAnyOptionAlreadySelected() {
+        _suggestions=("${_options[@]}")
+        _isAnySuggestionSelected
+    }
+    
+    _suggestions=()
+    _setCompletionsFromNotAlreadySelected() {
+        for suggestion in $_suggestions; do
+            if [[ ! " ${_alreadySelected[*]} " =~ " ${suggestion} " ]]; then
+                _completions+=("$suggestion")
+            fi
+        done       
+    }
+    
+    _withTasksRemaining() {        
+        if _isAnyTaskAlreadySelected && ! _isAnyOptionAlreadySelected; then
+            _suggestions=("${_tasks[@]}")    
+            _setCompletionsFromNotAlreadySelected
+        fi
+    }
+    
+    _withOptionsRemaining() {        
+        _suggestions=("${_options[@]}")                
+        _setCompletionsFromNotAlreadySelected        
+    }
+    
+    _addCompletions() {
+      _describe -t _completions $1 _completions && ret=0        
+    }
+    
+    _tasks() {
+        _withTasksAll
+        _addCompletions "tasks"
+    }
+    
+    _remainingTasksAndOptions() {
+        _withTasksRemaining
+        _withOptionsRemaining
+        _addCompletions "remainingTasksAndOptions"
+    }
+    
+    _arguments -s \
+    '1:tasks:_tasks' \
+    '*:remainingTasksAndOptions:_remainingTasksAndOptions'
+}
+
+# https://github.com/Aloxaf/fzf-tab/issues/65#issuecomment-602144985
+_gradle() {    
+    _gradle_tasks    
+}
