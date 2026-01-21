@@ -1,7 +1,7 @@
 # __append_to_prompt, __select copied from
 # https://github.com/pabloariasal/zfm/blob/master/zfm.zsh
 
-function __append_to_prompt() {
+function __fzf_gradle_tasks_append_to_prompt() {
     if [[ -z "$1" ]]; then
         zle reset-prompt
         return 0
@@ -14,7 +14,7 @@ function __append_to_prompt() {
 
 local __list
 
-function __select() {
+fufzf_nction __gradle_tasks_select() {
     setopt localoptions pipefail no_aliases 2> /dev/null
     local opts="--reverse --exact --no-sort --cycle --height 100% $FZF_DEFAULT_OPTS"
     selected_dir="$(\
@@ -24,13 +24,13 @@ function __select() {
     | FZF_DEFAULT_OPTS="$@ ${opts}" fzf --query "$lastPart" \
     | awk '{print $1}' \
     )"
-    __append_to_prompt "$selected_dir"
+    __fzf_gradle_tasks_append_to_prompt "$selected_dir"
 }
 
 function fzf-gradle-tasks() {
     lastPart=${BUFFER#* }
     __list=$(./gradlew -q :tasks --all | awk '!/^[A-Z]/ && $1 ~ /[a-zA-Z]/ {print $1}')
-    __select
+    __fzf_gradle_tasks_select
 }
 
 zle -N fzf-gradle-tasks
