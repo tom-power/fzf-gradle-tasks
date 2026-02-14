@@ -14,7 +14,7 @@ function __fzf_gradle_tasks_append_to_prompt() {
 
 local __list
 
-fufzf_nction __gradle_tasks_select() {
+function __fzf_gradle_tasks_select() {
     setopt localoptions pipefail no_aliases 2> /dev/null
     local opts="--reverse --exact --no-sort --cycle --height 100% $FZF_DEFAULT_OPTS"
     selected_dir="$(\
